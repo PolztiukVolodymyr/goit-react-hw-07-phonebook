@@ -37,9 +37,9 @@ export default function ContactForm() {
        }
    
    if (name && number) {
-     const addedContact = await addContact({ name: name, phone: number });
+     await addContact({ name: name, phone: number });
       toast.success(`Contact created`);
-           console.log(addedContact);
+          //  console.log(addedContact);
        reset();
     }
        

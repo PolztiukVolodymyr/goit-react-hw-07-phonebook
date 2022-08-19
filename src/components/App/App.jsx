@@ -17,7 +17,7 @@ export function App() {
 	
 		if (data) {
       if (data.length !== 0) {
-        console.log(data);
+       
         return data.filter(contact =>
           contact.name.toLowerCase().includes(filter.toLowerCase())
         
