@@ -1,12 +1,19 @@
 import { useState } from "react";
-import { nanoid } from 'nanoid';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import {
+  useAddContactMutation,
+  useGetContactsQuery
+} from '../../redux/Api';
 import PropTypes from 'prop-types';
 import css from './ContactForm.module.css';
 
 
-export default function ContactForm({onSubmit}) {
-    const [name, setName] = useState("");
-    const [number, setNumber] = useState("");
+export default function ContactForm() {
+  const [name, setName] = useState("");
+  const [number, setNumber] = useState("");
+  const [addContact] = useAddContactMutation();
+  const { data } = useGetContactsQuery();
 
     const handleChange = evt => {
      
@@ -19,15 +26,23 @@ export default function ContactForm({onSubmit}) {
         };
     };
     
- const  handleSubmit = evt => {
-    evt.preventDefault();
-     const newContact = {
-      id: nanoid(),
-      name,
-      number
-    };
-    onSubmit(newContact);
-    reset();
+ const  handleSubmit = async evt => {
+   evt.preventDefault();
+   if (data.find(contact =>
+        contact.name.toLocaleLowerCase() === name.toLocaleLowerCase())
+   ) {
+       reset();
+       return toast.warning(`${name} is alredy in contacts`);
+       
+       }
+   
+   if (name && number) {
+     const addedContact = await addContact({ name: name, phone: number });
+      toast.success(`Contact created`);
+           console.log(addedContact);
+       reset();
+    }
+       
   };
 
  const reset = () => {
@@ -36,38 +51,39 @@ export default function ContactForm({onSubmit}) {
     };
     
   
-        return (
+  return (
     <form onSubmit={handleSubmit} className={css.form}>
-    <label className={css.label}>Name
-      <input
-        onChange={handleChange}
-        type="text"
-        name="name"
-        value={name}
-        placeholder={"Enter name"}
-        pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-        title="Name may contain only letters, apostrophe, dash and spaces.
+      <label className={css.label}>Name
+        <input
+          onChange={handleChange}
+          type="text"
+          name="name"
+          value={name}
+          placeholder={"Enter name"}
+          pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
+          title="Name may contain only letters, apostrophe, dash and spaces.
          For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-        required
+          required
         />
-    </label>
-    <label className={css.label}>Number
-      <input
-        onChange={handleChange}
-        type="tel"
-        name="number"
-        value={number}
-        placeholder={"Enter number"}
-        pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-        title="Phone number must be digits and can contain spaces, dashes,
+      </label>
+      <label className={css.label}>Number
+        <input
+          onChange={handleChange}
+          type="tel"
+          name="number"
+          value={number}
+          placeholder={"Enter number"}
+          pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
+          title="Phone number must be digits and can contain spaces, dashes,
          parentheses and can start with +"
-        required
-      />
-    </label>
-    <button type="submit">Add contact</button>
+          required
+        />
+      </label>
+      <button type="submit">Add contact</button>
+      <ToastContainer theme="colored" />
     </form>
-        )
-    }
+  );
+};
 
 
 ContactForm.propTypes = {

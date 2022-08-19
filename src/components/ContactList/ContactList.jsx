@@ -1,15 +1,20 @@
 import PropTypes from 'prop-types';
 import css from "./ContactList.module.css";
+import {  useDeleteContactMutation } from "../../redux/Api";
 
-const ContactList = ({ contacts, onDeleteContact }) => {
+
+const ContactList = ({contacts}) => {
+
+const [deleteContact] = useDeleteContactMutation();
+ 
   return (
     <ul className={css.list}>
-      {contacts.map(({ id, name, number }) => (
+      {contacts && contacts.map(({ id, name, phone }) => (
         <li key={id} className={css.item}>
           <p>
-            {name}:  {number}
+            {name}: {phone}
           </p>
-          <button type="submit" onClick={() => onDeleteContact(id)}>
+          <button type="button" onClick={() => deleteContact(id)}>
             Delete
           </button>
         </li>
@@ -18,16 +23,16 @@ const ContactList = ({ contacts, onDeleteContact }) => {
   );
 };
 
+export default ContactList;
+
 ContactList.propTypes = {
   contacts: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      number: PropTypes.string.isRequired,
+      id: PropTypes.string,
+      name: PropTypes.string,
+      number: PropTypes.string
     })
   ),
   onDeleteContact: PropTypes.func,
-  
 };
 
-export default ContactList;

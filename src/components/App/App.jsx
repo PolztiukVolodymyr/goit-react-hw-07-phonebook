@@ -1,63 +1,54 @@
-import { useSelector, useDispatch } from "react-redux";
-import {
-  addContact,
-  deleteContact,
-  setContact,
-} from "../../redux/ContactsSlice";
+import { useState } from 'react';
 
 import css from './App.module.css';
 import ContactForm from "../ContactForm/ContactForm";
 import ContactList from "../ContactList/ContactList";
 import Filter from "../Filter/Filter"
 
-export function App() { 
+import { useGetContactsQuery} from "../../redux/Api"
 
-  const dispatch = useDispatch();
-  const contacts = useSelector(state => state.contacts.items);
-  const filter = useSelector(state => state.contacts.filter);
 
-  const onSubmit = data => {
-      
-    const contactNames = contacts.map(contact => contact.name);
+export function App() {
 
-    if (contactNames.includes(data.name)) {
-      alert(`${data.name} is already in contacts.`);
-    } else {
-      dispatch(addContact(data));
-    }
+  const [filter, setFilter] = useState('');
+	const { data } = useGetContactsQuery();
+
+ 	const  isVisibleContacts = () => {
+	
+		if (data) {
+      if (data.length !== 0) {
+        console.log(data);
+        return data.filter(contact =>
+          contact.name.toLowerCase().includes(filter.toLowerCase())
+        
+        );
+			}
+		}
+		return;
   };
-
-     const  deleteContacts = contactId => {
-      dispatch(deleteContact(contactId));
-  };
-
+  
   const changeFilter = evt => {
-    dispatch(setContact(evt.target.value));
+      setFilter(evt.target.value);
   };
 
-   const filterContact = () => {
-    const normalizedFilter = filter.toLowerCase();
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(normalizedFilter)
-    );
-  };
-
-  const filteredContacts = filterContact();
   
       return (
     <div className={css.container}>
           <h1 className={css.title}>Phonebook</h1>
           <div className={css.wrap}>
-            <ContactForm onSubmit={onSubmit} />
+            <ContactForm />
           </div>
         <h2 className={css.titleSection}>Contacts</h2>
         
-        <Filter value={filter} onChange={changeFilter} />
-          {filteredContacts.length
+          <Filter filter={filter} onChange={changeFilter} />
+          <ContactList contacts={isVisibleContacts()} />
+          
+          {/* <Filter value={filter} onChange={changeFilter} /> */}
+          {/* {filteredContacts.length
             ? <ContactList
               contacts={filteredContacts}
               onDeleteContact={deleteContacts} />
-            : null}
+            : null} */}
     </div>
   )
 };
