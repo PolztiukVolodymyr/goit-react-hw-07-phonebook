@@ -39,7 +39,6 @@ export default function ContactForm() {
    if (name && number) {
      await addContact({ name: name, phone: number });
       toast.success(`Contact created`);
-          //  console.log(addedContact);
        reset();
     }
        
@@ -80,7 +79,7 @@ export default function ContactForm() {
         />
       </label>
       <button type="submit">Add contact</button>
-      <ToastContainer theme="colored" />
+      <ToastContainer theme="colored" autoClose={2000}/>
     </form>
   );
 };
